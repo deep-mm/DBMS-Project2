@@ -1,0 +1,6 @@
+{
+    "java.project.sourcePaths": [
+        "SimpleDB Clients",
+        "SimpleDB Engine"
+    ]
+}
