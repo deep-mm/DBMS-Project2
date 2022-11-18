@@ -1,5 +1,9 @@
 package src.buffer;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 import src.file.*;
 import src.log.LogMgr;
 
@@ -9,7 +13,10 @@ import src.log.LogMgr;
  *
  */
 public class BufferMgr {
-   private Buffer[] bufferpool;
+   // Replace array with map
+   //private Buffer[] bufferpool;
+   private Map<BlockId,Buffer> bufferMap;
+   private PriorityQueue<Buffer> bufferpool;
    private int numAvailable;
    private static final long MAX_TIME = 10000; // 10 seconds
    
@@ -21,10 +28,13 @@ public class BufferMgr {
     * @param numbuffs the number of buffer slots to allocate
     */
    public BufferMgr(FileMgr fm, LogMgr lm, int numbuffs) {
-      bufferpool = new Buffer[numbuffs];
+      //bufferpool = new Buffer[numbuffs];
+      bufferMap = new HashMap<BlockId,Buffer>();
       numAvailable = numbuffs;
+      bufferpool = new PriorityQueue<Buffer>(numbuffs, new BufferComparator());
       for (int i=0; i<numbuffs; i++)
-         bufferpool[i] = new Buffer(fm, lm);
+         //bufferpool[i] = new Buffer(fm, lm);
+         bufferpool.add(new Buffer(fm, lm, i));
    }
    
    /**
@@ -40,9 +50,10 @@ public class BufferMgr {
     * @param txnum the transaction's id number
     */
    public synchronized void flushAll(int txnum) {
-      for (Buffer buff : bufferpool)
+      //for (Buffer buff : bufferpool)
+      for (Buffer buff : bufferMap.values())
          if (buff.modifyingTx() == txnum)
-         buff.flush();
+            buff.flush();
    }
    
    
@@ -77,6 +88,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+
          return buff;
       }
       catch(InterruptedException e) {
@@ -104,6 +116,7 @@ public class BufferMgr {
          if (buff == null)
             return null;
          buff.assignToBlock(blk);
+         bufferMap.put(blk, buff);
       }
       if (!buff.isPinned())
          numAvailable--;
@@ -112,18 +125,41 @@ public class BufferMgr {
    }
    
    private Buffer findExistingBuffer(BlockId blk) {
-      for (Buffer buff : bufferpool) {
-         BlockId b = buff.block();
-         if (b != null && b.equals(blk))
-            return buff;
-      }
-      return null;
+      //for (Buffer buff : bufferpool) {
+      //   BlockId b = buff.block();
+      //   if (b != null && b.equals(blk))
+      //      return buff;
+      //}
+
+      //return null;
+
+      // Replace array with map
+      return bufferMap.get(blk);
    }
    
    private Buffer chooseUnpinnedBuffer() {
+      //for (Buffer buff : bufferpool)
+      //   if (!buff.isPinned())
+      //   return buff;
+      Buffer buff = bufferpool.peek();
+      if (buff.isPinned())
+         return null;
+      else {
+         bufferMap.remove(buff.block());
+         return buff;
+      }
+   }
+
+   public void printStatus(){
+      System.out.println("Allocated Buffers:");
+      for (Buffer buff : bufferMap.values())
+         System.out.println(buff.toString());
+      
+      System.out.print("Unpinned Buffers in LRU order: ");  
       for (Buffer buff : bufferpool)
          if (!buff.isPinned())
-         return buff;
-      return null;
+            System.out.print(buff.getId() + "(lsn" + buff.getLsn() + ") ");
+         else
+            break;
    }
 }
