@@ -6,6 +6,10 @@ public class BufferComparator implements Comparator<Buffer> {
 
     @Override
     public int compare(Buffer b1, Buffer b2) {
-        return b1.getLsn() > b2.getLsn() || b1.isPinned() ? 1 : -1;
+        if(b1.isPinned() && b2.isPinned() || (!b1.isPinned() && !b2.isPinned()))
+            return b1.getLsn() > b2.getLsn() ? 1 : -1;
+        else if(b1.isPinned())
+            return 1;
+        return -1;
     }
 }
