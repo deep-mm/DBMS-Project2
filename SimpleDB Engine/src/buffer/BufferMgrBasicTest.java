@@ -16,8 +16,8 @@ public class BufferMgrBasicTest {
       bm.printStatus();
       unpinBuffer(2); unpinBuffer(0); unpinBuffer(5); unpinBuffer(4);
       bm.printStatus();
-//      pinBuffer(8); pinBuffer(5); pinBuffer(7);
-//      bm.printStatus();
+      pinBuffer(8); pinBuffer(5); pinBuffer(7);
+      bm.printStatus();
    }
    
    private static void pinBuffer(int i) {
