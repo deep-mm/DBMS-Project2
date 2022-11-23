@@ -63,7 +63,9 @@ public class BufferMgr {
     * @param buff the buffer to be unpinned
     */
    public synchronized void unpin(Buffer buff) {
+      bufferpool.remove(buff);
       buff.unpin();
+      bufferpool.add(buff);
       if (!buff.isPinned()) {
          numAvailable++;
          notifyAll();
@@ -120,7 +122,9 @@ public class BufferMgr {
       }
       if (!buff.isPinned())
          numAvailable--;
+      bufferpool.remove(buff);
       buff.pin();
+      bufferpool.add(buff);
       return buff;
    }
    
@@ -151,15 +155,14 @@ public class BufferMgr {
    }
 
    public void printStatus(){
-      System.out.println("Allocated Buffers:");
+      System.out.println("\nAllocated Buffers:");
       for (Buffer buff : bufferMap.values())
-         System.out.println(buff.toString());
+         if(buff.isPinned())
+            System.out.println(buff.toString());
       
-      System.out.print("Unpinned Buffers in LRU order: ");  
-      for (Buffer buff : bufferpool)
+      System.out.println("\nUnpinned Buffers in LRU order: ");
+      for (Buffer buff : bufferMap.values())
          if (!buff.isPinned())
-            System.out.print(buff.getId() + "(lsn" + buff.getLsn() + ") ");
-         else
-            break;
+            System.out.println(buff.getId() + "(lsn" + buff.getLsn() + ") ");
    }
 }
