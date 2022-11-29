@@ -15,7 +15,7 @@ import src.log.LogMgr;
 public class BufferMgr {
    // Replace array with map
    //private Buffer[] bufferpool;
-   private Map<BlockId,Buffer> bufferMap;
+   public Map<BlockId,Buffer> bufferPoolMap;
    private PriorityQueue<Buffer> bufferpool;
    private int numAvailable;
    private static final long MAX_TIME = 10000; // 10 seconds
@@ -29,7 +29,7 @@ public class BufferMgr {
     */
    public BufferMgr(FileMgr fm, LogMgr lm, int numbuffs) {
       //bufferpool = new Buffer[numbuffs];
-      bufferMap = new HashMap<BlockId,Buffer>();
+      bufferPoolMap = new HashMap<BlockId,Buffer>();
       numAvailable = numbuffs;
       bufferpool = new PriorityQueue<Buffer>(numbuffs, new BufferComparator());
       for (int i=0; i<numbuffs; i++)
@@ -51,7 +51,7 @@ public class BufferMgr {
     */
    public synchronized void flushAll(int txnum) {
       //for (Buffer buff : bufferpool)
-      for (Buffer buff : bufferMap.values())
+      for (Buffer buff : bufferPoolMap.values())
          if (buff.modifyingTx() == txnum)
             buff.flush();
    }
@@ -118,7 +118,8 @@ public class BufferMgr {
          if (buff == null)
             return null;
          buff.assignToBlock(blk);
-         bufferMap.put(blk, buff);
+         buff.setLsn(-1);
+         bufferPoolMap.put(blk, buff);
       }
       if (!buff.isPinned())
          numAvailable--;
@@ -138,7 +139,7 @@ public class BufferMgr {
       //return null;
 
       // Replace array with map
-      return bufferMap.get(blk);
+      return bufferPoolMap.get(blk);
    }
    
    private Buffer chooseUnpinnedBuffer() {
@@ -149,20 +150,21 @@ public class BufferMgr {
       if (buff.isPinned())
          return null;
       else {
-         bufferMap.remove(buff.block());
+         bufferPoolMap.remove(buff.block());
          return buff;
       }
    }
 
    public void printStatus(){
       System.out.println("\nAllocated Buffers:");
-      for (Buffer buff : bufferMap.values())
+      for (Buffer buff : bufferPoolMap.values())
          if(buff.isPinned())
             System.out.println(buff.toString());
       
       System.out.println("\nUnpinned Buffers in LRU order: ");
-      for (Buffer buff : bufferMap.values())
+      for (Buffer buff : bufferpool.stream().toList())
          if (!buff.isPinned())
-            System.out.println(buff.getId() + "(lsn" + buff.getLsn() + ") ");
+            System.out.println("Buffer : " + buff.getId() + " (lsn : " + buff.getLsn() + " ) ");
+      System.out.println("");
    }
 }

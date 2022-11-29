@@ -113,10 +113,14 @@ public class Buffer {
 
    @Override
    public String toString() {
-      return "Buffer " + id + ": [file " + blk.fileName() + ", block " + blk.number() + "] " + (isPinned()?"pinned":"unpinned") + " lsn" + lsn;
+      return "Buffer " + id + ": [file " + blk.fileName() + ", block " + blk.number() + "] status : " + (isPinned()?"pinned":"unpinned") + " lsn " + lsn;
    }
 
    int getLsn() {
       return lsn;
+   }
+
+   void setLsn(int lsn) {
+      this.lsn = lsn;
    }
 }
