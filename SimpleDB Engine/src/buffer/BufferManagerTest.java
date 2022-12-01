@@ -1,5 +1,4 @@
 package src.buffer;
-
 import src.server.SimpleDB;
 import src.file.*;
 import src.log.LogMgr;
@@ -9,7 +8,7 @@ import java.util.*;
 public class BufferManagerTest {
    private static BufferMgr bm;
    private static LogMgr lm;
-   
+
    public static void main(String args[]) throws Exception {
       SimpleDB db = new SimpleDB("buffermgrtest", 400, 5);
       bm = db.bufferMgr();
@@ -30,15 +29,15 @@ public class BufferManagerTest {
       int lsn3 = createRecords(3);
       modifyPageInBuff(buff3, 60, lsn3);
 
-      unpinBuffer(3);
-      unpinBuffer(5);
+      unpinBuffer(buff3.block());
+      unpinBuffer(buff5.block());
 
       bm.printStatus();
 
       Buffer buff = pinBuffer(6);
 
-      bm.printStatus();    
-      
+      bm.printStatus();
+
       int lsn4 = createRecords(4);
       modifyPageInBuff(buff1, 20, lsn4);
 
@@ -49,35 +48,34 @@ public class BufferManagerTest {
       int lsn6 = createRecords(6);
       modifyPageInBuff(buff3, 10, lsn6);
 
-      unpinBuffer(3);
-      unpinBuffer(6);
+      unpinBuffer(buff3.block());
+      unpinBuffer(buff5.block());
 
       Buffer buff01 = pinBuffer(7);
 
-      bm.printStatus();       
-      
-      unpinBuffer(4);
+      bm.printStatus();
+
+      unpinBuffer(buff4.block());
 
       Buffer buff02 = pinBuffer(5);
 
-      bm.printStatus();      
-      
+      bm.printStatus();
+
       printTest();
    }
-   
+
    private static Buffer pinBuffer(int i) {
       BlockId blk = new BlockId("test", i);
       Buffer buff = bm.pin(blk);
-      bm.bufferPoolMap.put(blk,buff);
       System.out.println("Pin block " + i);
       return buff;
    }
-   
-   private static void unpinBuffer(int i) {
-      BlockId blk = new BlockId("test", i);
-      Buffer buff = bm.bufferPoolMap.remove(blk);
+
+   private static void unpinBuffer(BlockId blockId) {
+
+      Buffer buff =  bm.bufferPoolMap.get(blockId);
       bm.unpin(buff);
-      System.out.println("Unpin block " + i);
+      System.out.println("Unpin block " + blockId);
    }
 
    private static void modifyPageInBuff(Buffer buff, int byteNum, int lsn) {
