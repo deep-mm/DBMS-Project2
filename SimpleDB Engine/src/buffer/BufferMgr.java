@@ -158,8 +158,7 @@ public class BufferMgr {
    public void printStatus(){
       System.out.println("\nAllocated Buffers:");
       for (Buffer buff : bufferPoolMap.values())
-         if(buff.isPinned())
-            System.out.println(buff.toString());
+         System.out.println(buff.toString());
       
       System.out.println("\nUnpinned Buffers in LRM order: ");
       for (Buffer buff : bufferpool.stream().toList())
