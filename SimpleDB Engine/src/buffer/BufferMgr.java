@@ -161,7 +161,7 @@ public class BufferMgr {
          if(buff.isPinned())
             System.out.println(buff.toString());
       
-      System.out.println("\nUnpinned Buffers in LRU order: ");
+      System.out.println("\nUnpinned Buffers in LRM order: ");
       for (Buffer buff : bufferpool.stream().toList())
          if (!buff.isPinned())
             System.out.println("Buffer : " + buff.getId() + " (lsn : " + buff.getLsn() + " ) ");
