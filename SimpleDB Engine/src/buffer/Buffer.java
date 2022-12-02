@@ -20,7 +20,7 @@ public class Buffer {
    private BlockId blk = null;
    private int pins = 0;
    private int txnum = -1;
-   private int lsn = -1;
+   private int lsn = 0;
    private int id = -1;
 
    public Buffer(FileMgr fm, LogMgr lm, int id) {

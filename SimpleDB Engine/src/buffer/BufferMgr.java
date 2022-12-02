@@ -147,7 +147,7 @@ public class BufferMgr {
       //   if (!buff.isPinned())
       //   return buff;
       Buffer buff = bufferpool.peek();
-      if (buff.isPinned())
+      if (buff.isPinned() || buff.getLsn() == -1)
          return null;
       else {
          bufferPoolMap.remove(buff.block());
