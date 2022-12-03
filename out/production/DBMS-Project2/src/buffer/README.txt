@@ -1,3 +1,5 @@
+Authors : Deep Mehta (dmmehta2), Anmol Lunavat (alunavat)
+
 The following updates have been made to SimpleDB server for Project 2:
 
 1. Introduced a id for each buffer with get & set methods.

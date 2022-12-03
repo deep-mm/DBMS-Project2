@@ -1,6 +1,7 @@
 package src.buffer;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -161,9 +162,12 @@ public class BufferMgr {
          System.out.println(buff.toString());
       
       System.out.println("\nUnpinned Buffers in LRM order: ");
-      for (Buffer buff : bufferpool.stream().toList())
+      Iterator bufferIterator = bufferpool.iterator();
+      while (bufferIterator.hasNext()) {
+         Buffer buff = (Buffer)bufferIterator.next();
          if (!buff.isPinned())
             System.out.println("Buffer : " + buff.getId() + " (lsn : " + buff.getLsn() + " ) ");
+      }
       System.out.println("");
    }
 }
