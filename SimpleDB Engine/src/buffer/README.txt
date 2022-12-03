@@ -113,3 +113,71 @@ buff1        4           1           4
 
 * Note: Unpinned buffers are denoted with empty block id's
 
+---
+
+Code Output Snippet:
+
+Pin block 1
+Pin block 2
+Pin block 3
+Pin block 4
+Pin block 5
+Unpin block [file test, block 3]
+Unpin block [file test, block 5]
+
+Allocated Buffers:
+Buffer 1: [file test, block 5] status : unpinned lsn 1
+Buffer 0: [file test, block 4] status : pinned lsn -1
+Buffer 4: [file test, block 1] status : pinned lsn -1
+Buffer 3: [file test, block 3] status : unpinned lsn 3
+Buffer 2: [file test, block 2] status : pinned lsn 2
+
+Unpinned Buffers in LRM order: 
+Buffer : 1 (lsn : 1 ) 
+Buffer : 3 (lsn : 3 ) 
+
+Pin block 6
+
+Allocated Buffers:
+Buffer 0: [file test, block 4] status : pinned lsn -1
+Buffer 1: [file test, block 6] status : pinned lsn -1
+Buffer 4: [file test, block 1] status : pinned lsn -1
+Buffer 3: [file test, block 3] status : unpinned lsn 3
+Buffer 2: [file test, block 2] status : pinned lsn 2
+
+Unpinned Buffers in LRM order: 
+Buffer : 3 (lsn : 3 ) 
+
+Pin block 3
+Unpin block [file test, block 3]
+Unpin block [file test, block 6]
+Pin block 7
+
+Allocated Buffers:
+Buffer 0: [file test, block 4] status : pinned lsn -1
+Buffer 1: [file test, block 7] status : pinned lsn -1
+Buffer 4: [file test, block 1] status : pinned lsn 4
+Buffer 3: [file test, block 3] status : unpinned lsn 6
+Buffer 2: [file test, block 2] status : pinned lsn 2
+
+Unpinned Buffers in LRM order: 
+Buffer : 3 (lsn : 6 ) 
+
+Unpin block [file test, block 4]
+Pin block 5
+
+Allocated Buffers:
+Buffer 3: [file test, block 5] status : pinned lsn -1
+Buffer 0: [file test, block 4] status : unpinned lsn -1
+Buffer 1: [file test, block 7] status : pinned lsn -1
+Buffer 4: [file test, block 1] status : pinned lsn 4
+Buffer 2: [file test, block 2] status : pinned lsn 2
+
+Unpinned Buffers in LRM order: 
+Buffer : 0 (lsn : -1 ) 
+
+For key [file test, block 5], the values are Buffer 3: [file test, block 5] status : pinned lsn -1
+For key [file test, block 4], the values are Buffer 0: [file test, block 4] status : unpinned lsn -1
+For key [file test, block 7], the values are Buffer 1: [file test, block 7] status : pinned lsn -1
+For key [file test, block 1], the values are Buffer 4: [file test, block 1] status : pinned lsn 4
+For key [file test, block 2], the values are Buffer 2: [file test, block 2] status : pinned lsn 2
